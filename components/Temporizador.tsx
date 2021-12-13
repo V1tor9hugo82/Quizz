@@ -1,0 +1,27 @@
+import { CountdownCircleTimer } from 'react-countdown-circle-timer'
+import styles from '../styles/Temporizador.module.css'
+
+interface TemporizadorProps {
+  key: any
+  duracao: number
+  tempoEsgotado: () => void
+}
+
+export default function Temporizador(props: TemporizadorProps) {
+  return (
+    <div className={styles.temporizador}>
+      <CountdownCircleTimer
+        duration={props.duracao}
+        size={120}
+        isPlaying
+        onComplete={props.tempoEsgotado}
+        colors={[
+          ['#BCE596', 0.33],
+          ['#FFA500', 0.33],
+          ['#8B0000', 0.33],
+        ]}>
+        {({ remainingTime }) => remainingTime}
+      </CountdownCircleTimer>
+    </div>
+  )
+}

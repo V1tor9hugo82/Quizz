@@ -1,3 +1,4 @@
+import { embaralhar } from '../functions/arrays'
 import RespostaModel from './resposta'
 
 export default class QuestaoModel {
@@ -30,6 +31,10 @@ export default class QuestaoModel {
     return this.#acertou
   }
 
+  get naoRespondida() {
+    return !this.respondida
+  }
+
   get respondida() {
     for (let resposta of this.#respostas) {
       if (resposta.revelada) return true
@@ -37,12 +42,34 @@ export default class QuestaoModel {
     return false
   }
 
+  responderCom(indece: number): QuestaoModel {
+    const acertou = this.#respostas[indece]?.certa
+    const respostas = this.#respostas.map((resposta, i) => {
+      const respostaSelecionada = indece === i
+      const deveRevelar = respostaSelecionada || resposta.certa //pode retirar || resposta.certa para nao mostra a resposta
+      return deveRevelar ? resposta.revelar() : resposta
+    })
+    return new QuestaoModel(this.id, this.enunciado, respostas, acertou)
+  }
+
+  embaralharRespostas(): QuestaoModel {
+    let respostasEmbatalhadas = embaralhar(this.#respostas)
+    return new QuestaoModel(this.#id, this.#enunciado, respostasEmbatalhadas, this.#acertou)
+
+  }
+
+  static criarUsandoObjeto(obj: QuestaoModel): QuestaoModel {
+    const respostas = obj.respostas.map(resp => RespostaModel.criarUsandoObjeto(resp))
+    return new QuestaoModel(obj.id, obj.enunciado, respostas, obj.acertou)
+  }
+
   paraObjeto() {
     return {
       id: this.#id,
       enunciado: this.#enunciado,
-      respostas: this.#respostas.map(resp => resp.paraObjeto()),
+      respondida: this.respondida,
       acertou: this.#acertou,
+      respostas: this.#respostas.map(resp => resp.paraObjeto()),
     }
   }
 }
